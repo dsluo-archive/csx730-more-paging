@@ -1,16 +1,16 @@
 # csx730-more-paging Another Paging Activity
 
-**Paging** is a common memory management scheme that avoids external fragmentation
-by splitting physical memory into fixed-sized frames and logical memory into blocks
-of the same size called pages. In this activity, you will implement some functions
-for basic page-based address translation using a page table.
+Most modern systems support a large virtual address space (e.g., `1ul << 64`).
+In such an environment, the page table itself becomes excessively large.
+One way to deal with this scenario is to use a multi-level paging algorithm,
+sometimes referred to as **hierarchical paging**.
 
 ### Getting Started
 
 1. Form into **small groups of two or three** people. These instructions assume that at least one group
    member is logged into the Nike.
 
-1. Use Git to clone the repository for this exercise onto Nike into a subdirectory called 
+1. Use Git to clone the repository for this exercise onto Nike into a subdirectory called
    `csx730-morepaging`:
 
    ```
@@ -31,31 +31,54 @@ useful as a reference.
    for each group member. Then, **sign the piece of paper that your instructor has at the front
    of the room.**
 
-1. Under "Definitions" in `SUBMISSION.md`, provide the definition for each term
-   listed, according to Silberschatz, Gagne, and Galvin.
+1. Under "Questions" in `SUBMISSION.md`, provide answers to the following
+   questions, assuming you are on a 64 bit system with a 4096 byte page size:
 
-1. In `paging.c`, create a [typedef declaration] for an `addr_t` type based on
-   an `unsigned long`, then define the following constants:
+   1. What is the size of the set of all virtual addresses?
+      Show your work. You may express the solution in pseudo-C code.
 
-   * `M` -- a number such that `1ul << M` denotes the number of logical addresses
-     available using an `addr_t` type. Recall that bitwise left shifting of an integer
-     is similar to multiplying by a power of two.
+   1. Assuming a single page table, how many pages are theoretically possible?
+      Show your work. You may express the solution in pseudo-C code.
 
-   * `N` -- a number such that `1ul << N` denotes the page size in bytes. As a
-     start, we will assume a page size of `4` bytes. Recall that bitwise left shifting 
-     of an integer is similar to multiplying by a power of two.
+   1. Assuming a single page table, how big would that table need to be,
+	  in the following units: B, KB, MB, and GB?
+      Show your work. You may express the solution in pseudo-C code.
 
-   * `PO_MASK` -- an `addr_t` bit [mask](https://en.wikipedia.org/wiki/Mask_(computing))
-      that masks the lower `N` bits of a virtual / logical memory address, denoting the 
-      region used for the page offset. Like the others, this is also a constant value.
-      We're not asking you to write a function-like macro.
+   1. Assume that each virtual address is broken up in to three parts:
 
-   * `PN_MASK` -- an `addr_t` bit [mask](https://en.wikipedia.org/wiki/Mask_(computing))
-     that masks the higher `M - N` bits of a virtual / logical memory address, denoting 
-     the region used for the page number. Like the others, this is also a constant value.
-      We're not asking you to write a function-like macro.
+      ```
+	  |-------------------------------------------------------|
+	  | table0 page number | table1 page number | page offset |
+	  |-------------------------------------------------------|
+	  ```
 
-   * `PG_SIZE` -- the page size, calculated using `N`.
+	  If the number of bits reserved for `table0` and `table1` are
+	  equal, then how big would `table0` need to be, in the
+	  following units: B and KB?
+      Show your work. You may express the solution in pseudo-C code.
+
+   1. Assume that each virtual address is broken up in to five parts:
+
+      ```
+	  |-------------------------------------------------------|
+	  | table0 PN | table1 PN | table2 PN | table3 PN | PO    |
+	  |-------------------------------------------------------|
+	  ```
+
+	  If the number of bits reserved for each table is equal,
+	  then how big would `table0` need to be, in the following
+	  units: B and KB?
+      Show your work. You may express the solution in pseudo-C code.
+
+1. In `paging.c`, create a `struct` for an `addr_type` that uses
+   [bit fields](https://en.cppreference.com/w/c/language/bit_field)
+   to define the various parts of the address:
+
+   * The variable for each page number should be `pn0`, `pn1`, etc.,
+     and the page offset should be `off`.
+
+1. For convenience, also create a typedef for an `addr_t` type based
+   on `struct addr_type`.
 
 1. Check your masks against the following virtual addresses:
 
@@ -71,7 +94,7 @@ useful as a reference.
    | `000000000000000d` | `13` | `3` | `1` |
    | `0000000000000003` | `3`  | `0` | `3` |
    | `000000000000000f` | `15` | `3` | `3` |
-   
+
    where DEC denotes the decimal representation of the address,
    PN denotes the page number, and
    PO denotes the page offset.
@@ -83,8 +106,8 @@ useful as a reference.
    ```c
    addr_t page_table [4] = { 5, 6, 1, 2 };
    ```
-   
-   Here, each index in the page table refers to a page number in virtual memory. 
+
+   Here, each index in the page table refers to a page number in virtual memory.
    Each value in the page table holds that page's corresponding frame number in physical
    memory. An alternative approach might use frame addresses instead of frame
    numbers.

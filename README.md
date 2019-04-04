@@ -115,6 +115,8 @@ useful as a reference.
    array should be of type `entry_t`. In `main`, initialize
    the entries in the table to `0`.
 
+   **CHECK YOURSELF:** Is the size of the table what you thought it would be?
+
 1. Next, implement the following function:
 
    * `addr_t virt_to_phys(addr_t virt);` -- returns the physical address for a

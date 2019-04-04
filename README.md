@@ -127,7 +127,9 @@ useful as a reference.
 	 * If the next table does not exist, then you should use `malloc(3)` to
 	   dynamically allocate the table and initialize its values. For this
 	   exercise, you may initialize the intermediate tables to and frame numbers
-	   such that no frames overlap between addresses.
+	   such that no frames overlap between addresses. In a real operating system,
+	   `kmalloc` (i.e., the kernel's memory allocator) is usually used to create
+	   the subsequent tables.
 
 1. In `main`, write code to test your implementation. Provide enough output to
    convince yourself and others that your implementation works. At a minumum,

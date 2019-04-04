@@ -146,7 +146,7 @@ useful as a reference.
    From the parent directory:
 
    ```
-   $ submit csx730-paging csx730
+   $ submit csx730-more-paging csx730
    ```
 
 1. Remember to share this directory with your group members!

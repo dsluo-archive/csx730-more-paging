@@ -16,3 +16,7 @@
 4. RESPONSE HERE
 
 5. RESPONSE HERE
+
+## Struct Size
+
+The size of `struct addr_type` is ?? bytes.

@@ -41,38 +41,41 @@ useful as a reference.
       Show your work. You may express the solution in pseudo-C code.
 
    1. Assuming a single page table, how big would that table need to be,
-	  in the following units: B, KB, MB, and GB?
+      in the following units: B, KB, MB, and GB?
       Show your work. You may express the solution in pseudo-C code.
 
    1. Assume that each virtual address is broken up in to three parts:
 
       ```
-	  |-------------------------------------------------------|
-	  | table0 page number | table1 page number | page offset |
-	  |-------------------------------------------------------|
-	  ```
+      |-------------------------------------------------------|
+      | table0 page number | table1 page number | page offset |
+      |-------------------------------------------------------|
+      ```
 
-	  If the number of bits reserved for `table0` and `table1` are
-	  equal, then how big would `table0` need to be, in the
-	  following units: B and KB?
+      If the number of bits reserved for `table0` and `table1` are
+      equal, then how big would `table0` need to be, in the
+      following units: B and KB?
       Show your work. You may express the solution in pseudo-C code.
 
    1. Assume that each virtual address is broken up in to five parts:
 
       ```
-	  |-------------------------------------------------------|
-	  | table0 PN | table1 PN | table2 PN | table3 PN | PO    |
-	  |-------------------------------------------------------|
-	  ```
+      |-------------------------------------------------------|
+      | table0 PN | table1 PN | table2 PN | table3 PN | PO    |
+      |-------------------------------------------------------|
+      ```
 
-	  If the number of bits reserved for each table is equal,
-	  then how big would `table0` need to be, in the following
-	  units: B and KB?
+      If the number of bits reserved for each table is equal,
+      then how big would `table0` need to be, in the following
+      units: B and KB?
       Show your work. You may express the solution in pseudo-C code.
+
+**CHECKPOINT**
 
 1. In `paging.c`, create a `struct` for an `addr_type` that uses
    [bit fields](https://en.cppreference.com/w/c/language/bit_field)
-   to define the various parts of the address:
+   to define the various parts of four-table, hierarchical virtual
+   memory address:
 
    * Each field should be of type `unsigned long`.
      This is allowed by GCC even in strictly conforming code.
@@ -83,86 +86,57 @@ useful as a reference.
 1. For convenience, also create a typedef for an `addr_t` type based
    on `struct addr_type`.
 
-1. Check your masks against the following virtual addresses:
+1. Under "Struct Size" in `SUBMISSION.md`, please indicate what
+   the size of the `struct` is, in bytes.
 
-   | Virtual Address    | DEC  | PN  | PO  |
-   |--------------------|------|-----|-----|
-   | `0000000000000001` | `1`  | `0` | `1` |
-   | `000000000000000b` | `11` | `2` | `3` |
-   | `0000000000000000` | `0`  | `0` | `0` |
-   | `0000000000000006` | `6`  | `1` | `2` |
-   | `000000000000000f` | `15` | `3` | `3` |
-   | `0000000000000009` | `9`  | `2` | `1` |
-   | `0000000000000007` | `7`  | `1` | `3` |
-   | `000000000000000d` | `13` | `3` | `1` |
-   | `0000000000000003` | `3`  | `0` | `3` |
-   | `000000000000000f` | `15` | `3` | `3` |
+1. In `main`, initialize an `addr_t` with some page number values
+   and an offset value. Then, `make` the executable and use GDB to
+   confirm that the binary representation of the `addr_t` contains
+   the values in their appropiate locations within the type. You
+   may find `p/t` and `x/d` useful for printing and examining
+   the values in GDB.
 
-   where DEC denotes the decimal representation of the address,
-   PN denotes the page number, and
-   PO denotes the page offset.
+1. Repeat the last step for a couple different virtual addresses
+   to test confirm that your `struct` is defined correctly.
 
 **CHECKPOINT**
 
-1. In `paging.c`, declare a page table with four entries:
+1. In `paging.c`, declare a [`union`](https://en.cppreference.com/w/c/language/union)
+   called `entry_type` that has the following overlapping members:
 
-   ```c
-   addr_t page_table [4] = { 5, 6, 1, 2 };
-   ```
+   * `addr_t frame`
+   * `union entry_type * next`
 
-   Here, each index in the page table refers to a page number in virtual memory.
-   Each value in the page table holds that page's corresponding frame number in physical
-   memory. An alternative approach might use frame addresses instead of frame
-   numbers.
+1. For convenience, also create a typedef for an `entry_t` type based
+   on `union entry_type`.
 
-1. Next, implement the following functions:
+1. In `paging.c`, declare a page table called `table0` with
+   the appropriate number of entried. Each element of the
+   array should be of type `entry_t`. In `main`, initialize
+   the entries in the table to `0`.
+
+1. Next, implement the following function:
 
    * `addr_t virt_to_phys(addr_t virt);` -- returns the physical address for a
      given virtual address based on the page table.
 
-   * `addr_t phys_to_virt(addr_t phys);` -- returns the virtual address for a
-     given physical address based on the page table.
+     * To compute the address, you will need to follow the table to the
+	   next table, etc., until you get to the final table, which will give
+	   you the frame number.
 
-1. Verify that your functions work against the following addresses:
+	 * If the next table does not exist, then you should use `malloc(3)` to
+	   dynamically allocate the table and initialize its values. For this
+	   exercise, you may initialize the intermediate tables to and frame numbers
+	   such that no frames overlap between addresses.
 
-   | Virtual Address    | Physical Address   |
-   |--------------------|--------------------|
-   | `0000000000000001` | `0000000000000015` |
-   | `000000000000000b` | `0000000000000007` |
-   | `0000000000000000` | `0000000000000014` |
-   | `0000000000000006` | `000000000000001a` |
-   | `000000000000000f` | `000000000000000b` |
-   | `0000000000000009` | `0000000000000005` |
-   | `0000000000000007` | `000000000000001b` |
-   | `000000000000000d` | `0000000000000009` |
-   | `0000000000000003` | `0000000000000017` |
-   | `000000000000000f` | `000000000000000b` |
-
-**CHECKPOINT**
-
-1. In `paging.c`, declare some global variables to represent a virtual memory
-   space and a physical memory space:
-
-   ```c
-   char virt_mem [PG_SIZE * 4]; // four virtual pages
-   char phys_mem [PG_SIZE * 8]; // eight physical pages
-   ```
-
-1. In your `main` funtion, initialize both memory spaces to `' '` (i.e., the
-   whitespace character).
-
-1. Next, reinitalize the virtual memory space to contain the alphabet
-   characters `a`, `b`, ..., etc. As you initialize each space, use your
-   `virt_to_phys` function to also place the character in the appropriate
-   location within the physical memory space.
-
-1. Finally, print out all addresses in each space along with their stored
-   values. If done correctly, it should match up with Figure 9.10 in
-   Silberschatz, Gagne, and Galvin.
+1. In `main`, write code to test your implementation. Provide enough output to
+   convince yourself and others that your implementation works. At a minumum,
+   this should demonstrate the translation of virtual addresses that take
+   similar and different paths through the tables.
 
 **SUBMISSION**
 
-1. **Before 11:55 PM on WED**, double check that your group member names are listed
+1. **Before 11:55 PM on FRI**, double check that your group member names are listed
    in `SUBMISSION.md` as well as the piece of paper that your instructor has at the
    front of the room, then submit your activity attempt using the `submit` command.
    From the parent directory:

@@ -74,8 +74,11 @@ useful as a reference.
    [bit fields](https://en.cppreference.com/w/c/language/bit_field)
    to define the various parts of the address:
 
+   * Each field should be of type `unsigned long`.
+     This is allowed by GCC even in strictly conforming code.
+
    * The variable for each page number should be `pn0`, `pn1`, etc.,
-     and the page offset should be `off`.
+     and the page offset variable should be called `off`.
 
 1. For convenience, also create a typedef for an `addr_t` type based
    on `struct addr_type`.

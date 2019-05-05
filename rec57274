@@ -1,0 +1,11 @@
+csx730-more-paging/:
+total 56
+-rw-r--r-- 1 ugrad   524 Apr  4 14:22 Makefile
+-rwxr-xr-x 1 ugrad  9658 Apr  5 20:50 paging
+-rw-r--r-- 1 ugrad   840 Apr  5 21:18 paging.c
+-rw-r--r-- 1 ugrad  6568 Apr  5 20:50 paging.o
+-rw-r--r-- 1 ugrad 13278 Apr  5 20:50 paging.s
+-rw-r--r-- 1 ugrad  6874 Apr  4 14:22 README.md
+-rw-r--r-- 1 ugrad     0 Apr  5 22:21 rec57274
+-rw-r--r-- 1 ugrad   583 Apr  4 14:58 SUBMISSION.md
+/home/ugrads/dluo/csx730-more-paging/:/home/work/csx730
